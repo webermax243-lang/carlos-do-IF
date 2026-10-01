@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projeto Fogão Acessível - UX/UI e Acessibilidade</title>
+    <style>
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #cbd5e0;
+            border-radius: 6px;
+            background-color: #e2e8f0;
+            display: inline-block;
+            min-height: 200px;
+        }
+
+        /* Estilos para a simulação interativa da interface */
+        .painel-simulacao {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .queimador-card {
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            color: #ffffff;
+            position: relative;
+        }
+
+        .status-led {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #475569;
+            margin: 10px auto;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .status-led.ligado {
+            background-color: #38bdf8;
+            box-shadow: 0 0 15px #38bdf8;
+        }
+
+        .status-led.quente {
+            background-color: #ef4444;
+            box-shadow: 0 0 15px #ef4444;
+            animation: piscar 1s infinite;
+        }
+
+        @keyframes piscar {
+            50% { opacity: 0.4; }
+        }
+
+        .btn-controle {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 5px;
+            touch-action: manipulation;
+        }
+
+        .btn-controle:active {
+            background: #1d4ed8;
+        }
+
+        .visor-digital {
+            background: #000000;
+            color: #facc15;
+            font-family: monospace;
+            font-size: 1.4rem;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #facc15;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<!-- Botão Acessível de Leitura por Voz -->
+<button id="btn-ler-pagina" 
+        onclick="alternarLeituraVoz()" 
+        aria-label="Ouvir conteúdo da página por voz"
+        style="background-color: #2563eb; color: #ffffff; border: none; padding: 12px 20px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+    <span aria-hidden="true">🔊</span> Mecanismo de leitura falada para cegos
+</button>
+<body style="font-family: Arial, Helvetica, sans-serif; background-color: #f8fafc; color: #0f172a; margin: 0; padding: 20px; line-height: 1.6;">
+
+    <!-- CABEÇALHO DA PÁGINA -->
+    <header role="banner" style="background-color: #0f172a; color: #ffffff; padding: 30px; text-align: center; border-radius: 8px; margin-bottom: 30px;">
+        <h1 style="margin: 0; font-size: 2.2rem; font-weight: 700; color: #ffffff;">Interface Acessível de Fogão Inteligente</h1>
+        <p style="font-size: 1.1rem; color: #cbd5e1; margin-top: 10px;">Desenvolvimento para Internet — Usabilidade e Acessibilidade em Interfaces</p>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main role="main" style="max-width: 900px; margin: 0 auto;">
+
+        <!-- SEÇÃO 1: APRESENTAÇÃO DO AUTOR -->
+        <section aria-labelledby="sec-autor" style="background-color: #ffffff; padding: 25px; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px;">
+            <h2 id="sec-autor" style="color: #1e3a8a; border-bottom: 3px solid #2563eb; padding-bottom: 8px; margin-top: 0; font-size: 1.5rem;">1. Apresentação do(a) Projetista</h2>
+            <p style="font-size: 1rem; margin-bottom: 12px;">
+                Olá! Meu nome é <strong>Weber Max Morison Gomes Vieira Lima</strong> e atuo como projetista de interfaces na disciplina de Desenvolvimento para Internet 1.
+            </p>
+            <p style="font-size: 1rem; margin-bottom: 0;">
+                O papel do designer e desenvolvedor vai muito além da estética: é sobre garantir que todas as pessoas, independentemente de suas limitações físicas, visuais, auditivas ou cognitivas, possam utilizar produtos do dia a dia com independência e segurança. A empatia na criação de interfaces nos obriga a enxergar as barreiras enfrentadas por usuários com nanismo, cadeirantes, idosos ou pessoas com deficiência visual e eliminá-las através dos princípios do design universal.
+            </p>
+        </section>
+
+        <!-- SEÇÃO 2: INTERFACE E CONCEITO -->
+        <section aria-labelledby="sec-conceito" style="background-color: #ffffff; padding: 25px; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px;">
+            <h2 id="sec-conceito" style="color: #1e3a8a; border-bottom: 3px solid #2563eb; padding-bottom: 8px; margin-top: 0; font-size: 1.5rem;">2. Conceito da Nova Interface de Fogão</h2>
+            
+            <figure style="text-align: center; margin: 25px 0;">
+                <img src="show.png" alt="Interface acessível do fogão apresentando painel frontal inclinado a 45 graus, botões anatômicos com marcações em relevo e Braille, tela digital de alto contraste e iluminação de LED indicativa ao redor dos seletores.">
+                <figcaption style="font-size: 0.95rem; color: #334155; margin-top: 10px; font-style: italic;">Figura 1: Proposta de interface frontal com controle tátil em Braille, alertas luminosos de alto contraste e respostas sonoras.</figcaption>
+                <!-- Botão de Redirecionamento -->
+<a href="carlos2.html" style="display: inline-block; margin-top: 15px; background-color: #2563eb; color: #ffffff; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-weight: bold;" 
+   aria-label="Clique para acessar a página de demonstração interativa do fogão acessível">
+    Acessar Demonstração Interativa 
+</a>
+            </figure>
+
+            <h3 style="color: #1d4ed8; margin-top: 25px; font-size: 1.25rem;">O Conceito do Design</h3>
+            <p style="font-size: 1rem;">
+                A interface foi projetada para resolver problemas cotidianos de segurança e ergonomia em cozinhas. O painel foi deslocado para a <strong>parte frontal do eletrodoméstico com inclinação de 45°</strong>. Essa mudança evita que o usuário precise esticar o braço sobre panelas ou bocas quentes e posiciona os comandos em uma altura acessível tanto para pessoas sentadas (cadeirantes ou pessoas com nanismo) quanto em pé (pessoas com gigantismo ou alta estatura).
+            </p>
+
+            <h3 style="color: #1d4ed8; margin-top: 20px; font-size: 1.25rem;">Necessidades Atendidas e Acessibilidade</h3>
+            <ul style="padding-left: 20px; font-size: 1rem;">
+                <li style="margin-bottom: 12px;"><strong>Deficiência Visual e Cegueira:</strong> Marcações em Braille nos comandos, textura emborrachada antiderrapante nos botões giratórios (<em>knobs</em>) para indicar a potência e respostas sonoras em frequências distintas para cada ação.</li>
+                <li style="margin-bottom: 12px;"><strong>Baixa Visão e Daltonismo:</strong> Tela digital com alto contraste (fundo preto com caracteres amarelo-canário) e indicação de status por meio de formas geométricas e símbolos, não dependendo apenas do código de cores verde/vermelho.</li>
+                <li style="margin-bottom: 12px;"><strong>Cadeirantes e Pessoas de Baixa Estatura (Nanismo):</strong> Comandos 100% frontais, rebaixados e inclinados, exigindo menor alcance físico e eliminação de pontos cegos.</li>
+                <li style="margin-bottom: 12px;"><strong>Deficiência Auditiva:</strong> Retorno visual por anéis luminosos de LED piscantes e alertas vibratórios nos botões seletores quando um comando é ativado ou quando houver falha no sistema.</li>
+                <li style="margin-bottom: 12px;"><strong>Segurança Integrada:</strong> Sistema de trava de segurança com válvula solenoide que corta automaticamente o fluxo de gás caso não haja detecção de chama em até 5 segundos.</li>
+            </ul>
+        </section>
+
+        <!-- SEÇÃO 3: SIMULADOR INTERATIVO (ÁREA FUNCIONAL ADICIONADA) -->
+        <section aria-labelledby="sec-simulador" style="background-color: #ffffff; padding: 25px; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px;">
+            <h2 id="sec-simulador" style="color: #1e3a8a; border-bottom: 3px solid #2563eb; padding-bottom: 8px; margin-top: 0; font-size: 1.5rem;">3. Painel Interativo de Teste (Simulação)</h2>
+            <p>Pressione e segure o botão de qualquer queimador por 2 segundos para destravar e acender. Clique novamente para desligar.</p>
+
+            <div id="visor-painel" class="visor-digital" aria-live="polite" role="status">
+                PAINEL PRONTO — TODOS OS QUEIMADORES DESLIGADOS
+            </div>
+
+            <div class="painel-simulacao">
+                <!-- Queimador 1 -->
+                <div class="queimador-card">
+                    <h4>Queimador 1 (⠂)</h4>
+                    <div id="led-1" class="status-led" title="Status do LED"></div>
+                    <p id="potencia-1">Status: OFF</p>
+                    <button class="btn-controle" onmousedown="iniciarPressao(1)" onmouseup="cancelarPressao(1)" onmouseleave="cancelarPressao(1)" ontouchstart="iniciarPressao(1)" ontouchend="cancelarPressao(1)">
+                        Segure 2s para Ligar / Desligar
+                    </button>
+                </div>
+
+                <!-- Queimador 2 -->
+                <div class="queimador-card">
+                    <h4>Queimador 2 (⠢)</h4>
+                    <div id="led-2" class="status-led" title="Status do LED"></div>
+                    <p id="potencia-2">Status: OFF</p>
+                    <button class="btn-controle" onmousedown="iniciarPressao(2)" onmouseup="cancelarPressao(2)" onmouseleave="cancelarPressao(2)" ontouchstart="iniciarPressao(2)" ontouchend="cancelarPressao(2)">
+                        Segure 2s para Ligar / Desligar
+                    </button>
+                </div>
+
+                <!-- Queimador 3 -->
+                <div class="queimador-card">
+                    <h4>Queimador 3 (⠒)</h4>
+                    <div id="led-3" class="status-led" title="Status do LED"></div>
+                    <p id="potencia-3">Status: OFF</p>
+                    <button class="btn-controle" onmousedown="iniciarPressao(3)" onmouseup="cancelarPressao(3)" onmouseleave="cancelarPressao(3)" ontouchstart="iniciarPressao(3)" ontouchend="cancelarPressao(3)">
+                        Segure 2s para Ligar / Desligar
+                    </button>
+                </div>
+
+                <!-- Queimador 4 -->
+                <div class="queimador-card">
+                    <h4>Queimador 4 (⠔)</h4>
+                    <div id="led-4" class="status-led" title="Status do LED"></div>
+                    <p id="potencia-4">Status: OFF</p>
+                    <button class="btn-controle" onmousedown="iniciarPressao(4)" onmouseup="cancelarPressao(4)" onmouseleave="cancelarPressao(4)" ontouchstart="iniciarPressao(4)" ontouchend="cancelarPressao(4)">
+                        Segure 2s para Ligar / Desligar
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 4: MANUAL DE USO -->
+        <section aria-labelledby="sec-manual" style="background-color: #ffffff; padding: 25px; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px;">
+            <h2 id="sec-manual" style="color: #1e3a8a; border-bottom: 3px solid #2563eb; padding-bottom: 8px; margin-top: 0; font-size: 1.5rem;">4. Manual de Uso Acessível</h2>
+
+            <h3 style="color: #1d4ed8; font-size: 1.25rem;">Comandos e Botões</h3>
+            <p style="font-size: 1rem;">
+                Cada queimador possui um seletor giratório anatômico revestido em borracha antiderrapante. O topo de cada botão possui um ponto tátil em alto-relevo indicando a posição "Desligado" (OFF) e ranhuras laterais para indicar os níveis de temperatura de 1 a 5.
+            </p>
+
+            <h3 style="color: #1d4ed8; font-size: 1.25rem; margin-top: 20px;">Passo a Passo: Como Acender uma Boca do Fogão</h3>
+            <ol style="padding-left: 20px; font-size: 1rem;">
+                <li style="margin-bottom: 10px;">Localize o seletor do queimador desejado utilizando a identificação em Braille ou a ordem tátil no painel (da esquerda para a direita: 1 a 4).</li>
+                <li style="margin-bottom: 10px;">Pressione o botão para dentro por 2 segundos para destravar o sistema de segurança (uma vibração suave e um bipe curto confirmarão o destravamento).</li>
+                <li style="margin-bottom: 10px;">Gire o botão no sentido anti-horário. O faiscador automático será acionado instantaneamente.</li>
+                <li style="margin-bottom: 10px;">Ao acender o fogo, o anel luminoso ao redor do botão acenderá em tom azul brilhante e o visor central de alto contraste exibirá a potência selecionada.</li>
+            </ol>
+
+            <aside role="alert" aria-live="polite" style="background-color: #fef2f2; border-left: 6px solid #dc2626; padding: 20px; margin-top: 25px; border-radius: 4px;">
+                <h4 style="margin: 0 0 10px 0; color: #991b1b; font-size: 1.1rem; display: flex; align-items: center;">
+                    <span aria-hidden="true" style="font-size: 1.4rem; margin-right: 8px;">⚠️</span> Dicas Importantes de Segurança Acessível
+                </h4>
+                <ul style="margin: 0; padding-left: 20px; color: #7f1d1d; font-size: 0.98rem;">
+                    <li style="margin-bottom: 8px;"><strong>Detecção e Bloqueio de Vazamento:</strong> Se a chama apagar acidentalmente por vento ou líquido derrubado, o fogão emite um alarme sonoro contínuo, pisca o anel luminoso em vermelho e bloqueia automaticamente a saída do gás em até 5 segundos.</li>
+                    <li style="margin-bottom: 0;"><strong>Alerta de Superfície Quente:</strong> Após o desligamento do queimador, a luz vermelha intermitente ao redor do botão permanecerá piscando até que a temperatura da mesa atinja um nível seguro para o toque.</li>
+                </ul>
+            </aside>
+        </section>
+
+    </main>
+
+    <!-- RODAPÉ DA PÁGINA -->
+    <footer role="contentinfo" style="background-color: #0f172a; color: #94a3b8; text-align: center; padding: 20px; border-radius: 8px; margin-top: 30px;">
+        <p style="margin: 0; font-size: 0.95rem;">Projeto Desenvolvido para a disciplina de Desenvolvimento para Internet 1 — Foco em Usabilidade e Acessibilidade Web (2026)</p>
+    </footer>
+
+    <!-- SCRIPT JAVASCRIPT: ADICIONA TODA A FUNCIONALIDADE INTERATIVA E DE ACESSIBILIDADE -->
+    <script>
+        // Estado dos queimadores
+        const estadoQueimadores = {
+            1: { ligado: false, quente: false },
+            2: { ligado: false, quente: false },
+            3: { ligado: false, quente: false },
+            4: { ligado: false, quente: false }
+        };
+
+        let temporizadorPressao = null;
+
+        // Função para emitir som acessível usando Web Audio API (sem arquivos de áudio externos)
+        function emitirSinalSonoro(frequencia = 440, duracao = 0.15) {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const ctx = new AudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(frequencia, ctx.currentTime);
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start();
+                osc.stop(ctx.currentTime + duracao);
+            } catch (e) {
+                console.log('Áudio não suportado ou aguardando interação do usuário.');
+            }
+        }
+
+        // Função para feedback háptico (vibração em dispositivos móveis)
+        function vibrar(ms = 100) {
+            if ('vibrate' in navigator) {
+                navigator.vibrate(ms);
+            }
+        }
+
+        function iniciarPressao(id) {
+            const visor = document.getElementById('visor-painel');
+            visor.innerText = `Pressionando Queimador ${id}... Aguarde 2s`;
+            emitirSinalSonoro(300, 0.05);
+
+            temporizadorPressao = setTimeout(() => {
+                alternarQueimador(id);
+            }, 2000);
+        }
+
+        function cancelarPressao(id) {
+            if (temporizadorPressao) {
+                clearTimeout(temporizadorPressao);
+                temporizadorPressao = null;
+                const visor = document.getElementById('visor-painel');
+                if (!estadoQueimadores[id].ligado && !estadoQueimadores[id].quente) {
+                    visor.innerText = `Ação cancelada. Mantenha pressionado por 2 segundos completos.`;
+                }
+            }
+        }
+
+        function alternarQueimador(id) {
+            const queimador = estadoQueimadores[id];
+            const led = document.getElementById(`led-${id}`);
+            const textoStatus = document.getElementById(`potencia-${id}`);
+            const visor = document.getElementById('visor-painel');
+
+            if (!queimador.ligado) {
+                // Liga o queimador
+                queimador.ligado = true;
+                queimador.quente = true;
+                led.className = 'status-led ligado';
+                textoStatus.innerText = 'Status: Nível 3 (Chama Média)';
+                visor.innerText = `QUEIMADOR ${id} ACESO — POTÊNCIA 3`;
+                emitirSinalSonoro(880, 0.2); // Bipe agudo de acendimento
+                vibrar(150);
+            } else {
+                // Desliga o queimador e ativa o modo "Superfície Quente"
+                queimador.ligado = false;
+                led.className = 'status-led quente';
+                textoStatus.innerText = 'Status: Desligado (Superfície Quente)';
+                visor.innerText = `QUEIMADOR ${id} DESLIGADO — ALERTA: SUPERFÍCIE QUENTE`;
+                emitirSinalSonoro(220, 0.3); // Bipe grave de desligamento
+                vibrar([50, 50, 50]);
+
+                // Simula resfriamento após 8 segundos
+                setTimeout(() => {
+                    queimador.quente = false;
+                    if (!queimador.ligado) {
+                        led.className = 'status-led';
+                        textoStatus.innerText = 'Status: OFF';
+                        visor.innerText = `QUEIMADOR ${id} RESFRIADO — SEGURO PARA O TOQUE`;
+                    }
+                }, 8000);
+            }
+        }
+        let sintetizador = window.speechSynthesis;
+let utrerancia = null;
+let lendo = false;
+
+function alternarLeituraVoz() {
+    const botao = document.getElementById('btn-ler-pagina');
+
+    // Se já estiver a ler, cancela a leitura atual
+    if (lendo) {
+        sintetizador.cancel();
+        lendo = false;
+        botao.innerHTML = '<span aria-hidden="true">🔊</span> Ouvir Página';
+        botao.setAttribute('aria-label', 'Ouvir conteúdo da página por voz');
+        return;
+    }
+
+    // Verifica se o navegador suporta síntese de voz
+    if (!('speechSynthesis' in window)) {
+        alert('O seu navegador não suporta a funcionalidade de leitura por voz.');
+        return;
+    }
+
+    // Captura apenas o texto das seções principais (evita ler scripts ou códigos de estrutura)
+    const conteudoMain = document.querySelector('main');
+    if (!conteudoMain) return;
+
+    // Extrai o texto visível da página
+    const textoParaLer = conteudoMain.innerText;
+
+    // Cria o objeto de pronúncia
+    utrerancia = new SpeechSynthesisUtterance(textoParaLer);
+    utrerancia.lang = 'pt-BR'; // Define o idioma para português
+    utrerancia.rate = 1.0;    // Velocidade de leitura (1.0 = normal)
+    utrerancia.pitch = 1.0;   // Tom da voz
+
+    // Seleciona preferencialmente a voz do Google em Português, se disponível no navegador
+    const voces = sintetizador.getVoices();
+    const vozGoogle = voces.find(voz => voz.lang.includes('pt') && voz.name.includes('Google'));
+    if (vozGoogle) {
+        utrerancia.voice = vozGoogle;
+    }
+
+    // Eventos de início e fim da leitura
+    utrerancia.onstart = function() {
+        lendo = true;
+        botao.innerHTML = '<span aria-hidden="true">⏹️</span> Parar Leitura';
+        botao.setAttribute('aria-label', 'Parar leitura por voz');
+    };
+
+    utrerancia.onend = function() {
+        lendo = false;
+        botao.innerHTML = '<span aria-hidden="true">🔊</span> Ouvir Página';
+        botao.setAttribute('aria-label', 'Ouvir conteúdo da página por voz');
+    };
+
+    utrerancia.onerror = function() {
+        lendo = false;
+        botao.innerHTML = '<span aria-hidden="true">🔊</span> Ouvir Página';
+    };
+
+    // Inicia a leitura
+    sintetizador.speak(utrerancia);
+}
+
+// Garante o carregamento prévio das vozes no navegador
+if ('speechSynthesis' in window) {
+    window.speechSynthesis.onvoiceschanged = function() {
+        window.speechSynthesis.getVoices();
+    };
+}
+    </script>
+</body>
+</html>
